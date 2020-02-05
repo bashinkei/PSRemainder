@@ -20,8 +20,11 @@ function GetEveryCheckScript {
     elseif ($definedEvry.type -eq [EveryType]::Monthly) {
         GetMonthlyCheckScript
     }
-    elseif ($definedEvry.type -eq [EveryType]::endOfMonth) {
-        GetEndOfMonthCheckScript
+    elseif ($definedEvry.type -eq [EveryType]::MonthlyInverse) {
+        GetMonthlyInverseCheckScript
+    }
+    elseif ($definedEvry.type -eq [EveryType]::MonthlyOfWorkDay) {
+        GetMonthlyOfWorkDayCheckScript
     }
 
     # 休日でも通知するの場合
@@ -117,7 +120,7 @@ function GetMonthlyCheckScript {
         $checkEvery.TrimEnd('st nd rd th') -eq $checkDate.Day
     }
 }
-function GetEndOfMonthCheckScript {
+function GetMonthlyInverseCheckScript {
     [OutputType([scriptblock])]
     param()
 
@@ -128,6 +131,31 @@ function GetEndOfMonthCheckScript {
             [Parameter(Mandatory)]
             [string]$checkEvery
         )
-        $checkDate.Day -eq [datetime]::DaysInMonth($checkDate.Year, $checkDate.Month)
+        # 月の日数が31日の場合　-> -1st = 31日; -2nd = 30日 ・・・　-31st = 1日
+        $checkEvery.TrimEnd('st nd rd th') -eq $checkDate.Day - [datetime]::DaysInMonth($checkDate.Year, $checkDate.Month) - 1
+    }
+}
+function GetMonthlyOfWorkDayCheckScript {
+    [OutputType([scriptblock])]
+    param()
+
+    return {
+        param (
+            [Parameter(Mandatory)]
+            [datetime] $checkDate,
+            [Parameter(Mandatory)]
+            [string]$checkEvery
+        )
+
+        $workdays = GetWorkDayList -datetime $checkDate
+        [int]$nth = $checkEvery.TrimEnd('st nd rd th WorkDay')
+
+        # 稼働日数を超えていたらNG
+        if ($workdays.count -lt [System.Math]::Abs($nth)) { $false }
+
+        $arrayIndex = if ($nth -gt 0) { $nth - 1 } else {$workdays.count + $nth}
+        $nthDay = ($workdays | Sort-Object)[$arrayIndex]
+
+        return $nthDay.Day -eq $checkDate.Day
     }
 }
