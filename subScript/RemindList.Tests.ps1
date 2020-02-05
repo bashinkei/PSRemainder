@@ -34,10 +34,10 @@ function GetReminds {
     $remainds += MakeRemind "Wednesday"  "PrevWorkDay"    "15:00" "Wednesday,PrevWorkDay_test_OK"
     $remainds += MakeRemind "Thursday"   "NextWorkDay"    "15:00" "Thursday,NextWorkDay_test_OK"
     $remainds += MakeRemind "Friday"     "Notify"         "15:00" "Friday,Notify_test_OK"
-    $remainds += MakeRemind "endOfMonth" "Notify"         "15:00" "Friday,Notify_test_OK"
+    $remainds += MakeRemind "-1st"       "Notify"         "15:00" "Friday,Notify_test_OK"
     $remainds += MakeRemind "NG1"        "Notify"         "15:00" "everyが不正"
-    $remainds += MakeRemind "endOfMonth" "NG2"            "15:00" "whenNonWorkDayが不正"
-    $remainds += MakeRemind "endOfMonth" "Notify"         "25:00" "時間が不正"
+    $remainds += MakeRemind "-1st"       "NG2"            "15:00" "whenNonWorkDayが不正"
+    $remainds += MakeRemind "-1st"       "Notify"         "25:00" "時間が不正"
     return $remainds
 }
 

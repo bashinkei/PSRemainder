@@ -31,14 +31,17 @@ Describe "GetMonthlyCheckScript" {
     }
 }
 
-Describe "GetEndOfMonthCheckScript" {
-    $script = GetEndOfMonthCheckScript
+Describe "GetMonthlyInverseCheckScript" {
+    $script = GetMonthlyInverseCheckScript
 
-    It "月末の場合にtrueを返す" {
-        & ($script) "2020/01/31" "endOfMonth" | Should Be $true
+    It "-1thは月末の場合にtrueを返す" {
+        & ($script) "2020/01/31" "-1st" | Should Be $true
+    }
+    It "-31thは月初の場合にtrueを返す" {
+        & ($script) "2020/01/01" "-31st" | Should Be $true
     }
     It "日付と不一致した場合はfalseを返す" {
-        & ($script) "2020/01/30" "endOfMonth" | Should Be $false
+        & ($script) "2020/01/30" "-1st" | Should Be $false
     }
 }
 
@@ -46,7 +49,7 @@ Describe "GetEndOfMonthCheckScript" {
 Describe "GetEveryCheckScript" {
 
     Context "月末 & 休日でも通知する場合" {
-        $script = GetEveryCheckScript "endOfMonth" "Notify"
+        $script = GetEveryCheckScript "-1st" "Notify"
         It "月末であればtrueを返す" {
             & ($script) "2020/01/31" | Should Be $true
 
@@ -58,7 +61,7 @@ Describe "GetEveryCheckScript" {
         }
     }
     Context "月末 & 休日は通知しない場合" {
-        $script = GetEveryCheckScript "endOfMonth" "NotNotify"
+        $script = GetEveryCheckScript "-1st" "NotNotify"
         It "月末であればtrueを返す" {
             # TestWorkDayのモック
             # スコープの問題でMockコマンドだと参照できないっぽいのでここで定義
@@ -72,7 +75,7 @@ Describe "GetEveryCheckScript" {
         }
     }
     Context "月末 & 休日は前に就業日に通知の場合" {
-        $script = GetEveryCheckScript "endOfMonth" "PrevWorkDay"
+        $script = GetEveryCheckScript "-1st" "PrevWorkDay"
         # TestWorkDayのモック
         function Global:TestWorkDay ([datetime] $date) {
             if ($date.ToString("yyyy/MM/dd") -eq "2020/01/31") { return $false }
@@ -95,7 +98,7 @@ Describe "GetEveryCheckScript" {
     }
     Context "月末 & 休日は前に就業日に通知の場合" {
 
-        $script = GetEveryCheckScript "endOfMonth" "NextWorkDay"
+        $script = GetEveryCheckScript "-1st" "NextWorkDay"
         # TestWorkDayのモック
         function Global:TestWorkDay ([datetime] $date) {
             if ($date.ToString("yyyy/MM/dd") -eq "2020/02/03") { return $true }

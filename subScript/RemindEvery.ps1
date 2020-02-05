@@ -20,8 +20,8 @@ function GetEveryCheckScript {
     elseif ($definedEvry.type -eq [EveryType]::Monthly) {
         GetMonthlyCheckScript
     }
-    elseif ($definedEvry.type -eq [EveryType]::endOfMonth) {
-        GetEndOfMonthCheckScript
+    elseif ($definedEvry.type -eq [EveryType]::MonthlyInverse) {
+        GetMonthlyInverseCheckScript
     }
 
     # 休日でも通知するの場合
@@ -117,7 +117,7 @@ function GetMonthlyCheckScript {
         $checkEvery.TrimEnd('st nd rd th') -eq $checkDate.Day
     }
 }
-function GetEndOfMonthCheckScript {
+function GetMonthlyInverseCheckScript {
     [OutputType([scriptblock])]
     param()
 
@@ -128,6 +128,7 @@ function GetEndOfMonthCheckScript {
             [Parameter(Mandatory)]
             [string]$checkEvery
         )
-        $checkDate.Day -eq [datetime]::DaysInMonth($checkDate.Year, $checkDate.Month)
+        # 月の日数が31日の場合　-> -1st = 31日; -2nd = 30日 ・・・　-31st = 1日
+        $checkEvery.TrimEnd('st nd rd th') -eq $checkDate.Day - [datetime]::DaysInMonth($checkDate.Year, $checkDate.Month) - 1
     }
 }
