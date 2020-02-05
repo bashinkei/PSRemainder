@@ -45,6 +45,56 @@ Describe "GetMonthlyInverseCheckScript" {
     }
 }
 
+Describe "GetMonthlyOfWorkDayCheckScript" {
+    function Global:GetWorkDayList{
+        param ([datetime] $ParameterName)
+        [datetime]"2020/01/07"
+        [datetime]"2020/01/08"
+        [datetime]"2020/01/09"
+        [datetime]"2020/01/10"
+        [datetime]"2020/01/14"
+        [datetime]"2020/01/15"
+        [datetime]"2020/01/16"
+        [datetime]"2020/01/17"
+        [datetime]"2020/01/20"
+        [datetime]"2020/01/21"
+        [datetime]"2020/01/22"
+        [datetime]"2020/01/23"
+        [datetime]"2020/01/24"
+        [datetime]"2020/01/27"
+        [datetime]"2020/01/28"
+        [datetime]"2020/01/29"
+        [datetime]"2020/01/30"
+        [datetime]"2020/01/31"
+        [datetime]"2020/01/02"
+        [datetime]"2020/01/03"
+        [datetime]"2020/01/04"
+    }
+    $script = GetMonthlyOfWorkDayCheckScript
+
+    It "1stWorkDayは最初の営業日の場合にtrue" {
+        & ($script) "2020/01/02" "1stWorkDay" | Should Be $true
+    }
+    It "21thは31日だとtrueを返す（上のを数えた）" {
+        & ($script) "2020/01/31" "21st" | Should Be $true
+    }
+    It "-1stWorkDayは最後の営業日の場合にtrue" {
+        & ($script) "2020/01/31" "-1stWorkDay" | Should Be $true
+    }
+    It "-21thは1日だとtrueを返す（上のを数えた）" {
+        & ($script) "2020/01/02" "-21st" | Should Be $true
+    }
+    It "-22thは範囲外なのでfalse" {
+        & ($script) "2020/01/02" "-22st" | Should Be $false
+    }
+    It "日付と不一致した場合はfalseを返す" {
+        & ($script) "2020/01/03" "1st" | Should Be $false
+    }
+    It "日付と不一致した場合はfalseを返す2" {
+        & ($script) "2020/01/30" "-1st" | Should Be $false
+    }
+}
+
 
 Describe "GetEveryCheckScript" {
 
