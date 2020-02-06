@@ -58,6 +58,11 @@ function CheckRemand {
         FilterMatchRemind -remined $_ -checkStartMinits $checkStartMinutes -checkEndMinits  $checkMinutes
     }
 
+    # 通知対象をログに出力
+    if ($targetToast.count -ne 0) {
+        OutHostMessage "◆◇◆通知対象がヒット！"
+        $targetToast | % { OutHostMessage $_.original }
+    }
     # リマインドに一致したらトースト表示
     $targetToast | % { & (GetToastScript $_.message) }
 
