@@ -102,6 +102,19 @@ try {
         # アイコンにメニューを追加
         $notify_icon.ContextMenuStrip = New-Object System.Windows.Forms.ContextMenuStrip
 
+        # メニューにサンプルのリマインド表示を追加
+        $script = {
+            OutHostMessage "sample Remind toastクリック！"
+            & (GetToastScript "sample Message")
+        }
+        $menuItemSampleRemind = NewToolStripMenuItem -name "Sample Remind toast" -action $script
+        $null = $notify_icon.ContextMenuStrip.Items.Add($menuItemSampleRemind)
+
+        # メニューにセパレータ追加
+        $ToolStripSeparator = New-Object System.Windows.Forms.ToolStripSeparator
+        $null = $notify_icon.ContextMenuStrip.Items.Add($ToolStripSeparator)
+
+
         # メニューに日付リマインドファイルチェックを追加
         $script = {
             OutHostMessage "Check Date Remind Fileクリック！"
