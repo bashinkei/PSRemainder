@@ -29,7 +29,7 @@ function CheckRemindFile {
             $message += "`r`n"
         }
     }
-    & (GetToastScript -message $message )
+    & (GetToastScript -message $message -toastType Alarm)
 }
 
 function OutHostMessage {
@@ -64,7 +64,7 @@ function CheckRemand {
         $targetToast | % { OutHostMessage $_.original }
     }
     # リマインドに一致したらトースト表示
-    $targetToast | % { & (GetToastScript $_.message) }
+    $targetToast | % { & (GetToastScript -message $_.message -toastType Remind) }
 
     # 最終チェック日時を保存
     $Global:lastCheckMinutes = $checkMinutes
@@ -105,7 +105,7 @@ try {
         # メニューにサンプルのリマインド表示を追加
         $script = {
             OutHostMessage "sample Remind toastクリック！"
-            & (GetToastScript "sample Message")
+            & (GetToastScript -message "sample Message" -toastType Remind)
         }
         $menuItemSampleRemind = NewToolStripMenuItem -name "Sample Remind toast" -action $script
         $null = $notify_icon.ContextMenuStrip.Items.Add($menuItemSampleRemind)
