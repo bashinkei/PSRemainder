@@ -78,6 +78,7 @@ function GetDateRemindList {
             time             = $_.time
             message          = $_.message
             everyCheckScript = $everyCheckScript
+            original         = $_
         }
     }
     return [PSCustomObject]@{

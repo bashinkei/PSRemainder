@@ -1,18 +1,3 @@
-
-<# リマインドに日付が一致するかテスト #>
-function TestRemind {
-    [OutputType([bool])]
-    param (
-        [Parameter(Mandatory)]
-        [PSCustomObject] $remindOK,
-        [Parameter(Mandatory)]
-        [datetime] $checkMinutes
-    )
-    $hhmm = $checkMinutes.ToString($Global:TIME_FORMAT)
-    $ret = ($remindOK.time -eq $hhmm) -and (& $remindOK.everyCheckScript $checkMinutes)
-    return $ret
-}
-
 # リマインドの中で start~Endの中にあるものを返す
 function FilterMatchRemind {
     param (
@@ -26,9 +11,29 @@ function FilterMatchRemind {
     # 引数チェック
     if ($checkStartMinits -gt $checkEndMinits) { return }
 
-    $checkingMinutes = $checkStartMinits
-    while ($checkingMinutes -le $checkEndMinits) {
-        if (TestRemind -remindOK $remined -checkMinutes $checkingMinutes ) { return  $remined }
-        $checkingMinutes = $checkingMinutes.AddMinutes(1)
+    # 日付チェック
+    $checkStartDate = $checkStartMinits.Date
+    $checkEndDate = $checkEndMinits.date
+
+    # チェック対象の日付の範囲
+    $testDate = $checkStartDate
+    $rangeDateOfTarget = @()
+    $rangeDateOfTarget += while ($testDate -le $checkEndDate) {
+        Write-Output $testDate
+        $testDate = $testDate.AddDays(1)
+    }
+    foreach ($checkDate in $rangeDateOfTarget ) {
+        # 日付が通知対象の日かをチェック
+        if (& $remined.everyCheckScript $checkDate) {
+
+            # 時間が通知対象の時間かをチェック
+            $reminedMinutes = [datetime] ($checkDate.ToString("yyyy/MM/dd ") + $remined.time + ":00")
+            $notifycheckStartMinits = if ($checkDate.date -eq $checkStartDate) { $checkStartMinits } else { $checkDate.Date }
+            $notifycheckEndMinits = if ($checkDate.date -eq $checkEndDate) { $checkEndMinits } else { $checkDate.Date.AddDays(1).AddMinutes(-1) }
+            if ($notifycheckStartMinits -le $reminedMinutes -and
+                $reminedMinutes -le $notifycheckEndMinits) {
+                return $remined
+            }
+        }
     }
 }

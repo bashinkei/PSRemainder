@@ -5,7 +5,7 @@ function AddNumberToPsobjectArray {
         [array] $array
     )
     $pops = @()
-    $pops += (Get-Member -InputObject $array[0] -MemberType NoteProperty).Name
+    $pops += $array[0].psobject.Properties.Name # プロパティの一覧取得(追加順で取得できる)
     $pops += @{name = 'No'; expression = { $count } }
     $count = 0
     $AddNoArray = foreach ($object in $array ) {

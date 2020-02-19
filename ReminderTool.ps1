@@ -29,7 +29,7 @@ function CheckRemindFile {
             $message += "`r`n"
         }
     }
-    & (GetToastScript -message $message )
+    & (GetToastScript -message $message -toastType Alarm)
 }
 
 function OutHostMessage {
@@ -58,13 +58,43 @@ function CheckRemand {
         FilterMatchRemind -remined $_ -checkStartMinits $checkStartMinutes -checkEndMinits  $checkMinutes
     }
 
+    # 通知対象をログに出力
+    if ($targetToast.count -ne 0) {
+        OutHostMessage "◆◇◆通知対象がヒット！"
+        $targetToast | % { OutHostMessage $_.original }
+    }
     # リマインドに一致したらトースト表示
-    $targetToast | % { & (GetToastScript $_.message) }
+    $targetToast | % { & (GetToastScript -message $_.message -toastType Remind) }
 
     # 最終チェック日時を保存
     $Global:lastCheckMinutes = $checkMinutes
 }
 
+function CheckTodayRemand {
+
+    # リマインド一覧の再読み込み
+    $remainders = GetRemindList
+    $dateRemainders = GetDateRemindList
+
+    $remainders.OK += $dateRemainders.OK
+
+    # リマインドに一致するか確認
+    $todayStart = ((Get-Date).Date)
+    $todayEnd = ((Get-Date).Date).AddDays(1).AddMinutes(-1)
+    $targetToast = @()
+    $targetToast += $remainders.OK | % {
+        FilterMatchRemind -remined $_ -checkStartMinits $todayStart -checkEndMinits $todayEnd
+    }
+
+    # 通知対象をログに出力
+    if ($targetToast.count -ne 0) {
+        OutHostMessage "◆◇◆通知対象がヒット！"
+        $targetToast | % { OutHostMessage $_.original }
+    }
+    # リマインドに一致したらトースト表示
+    $targetToast | Sort-Object -Property "time" -Descending `
+    | % { & (GetToastScript -message ("【" + $_.time + "】" + $_.message) -toastType Alarm) }
+}
 
 $mutex = New-Object System.Threading.Mutex($false, $MUTEX_NAME)
 # 多重起動チェック
@@ -96,6 +126,32 @@ try {
 
         # アイコンにメニューを追加
         $notify_icon.ContextMenuStrip = New-Object System.Windows.Forms.ContextMenuStrip
+
+        # メニューに今日のリマインド表示を追加
+        $script = {
+            OutHostMessage "Notify Today Remindクリック！"
+            CheckTodayRemand
+        }
+        $menuItemNotifyTodayRemind = NewToolStripMenuItem -name "Notify Today Remind" -action $script
+        $null = $notify_icon.ContextMenuStrip.Items.Add($menuItemNotifyTodayRemind)
+
+        # メニューにセパレータ追加
+        $ToolStripSeparator = New-Object System.Windows.Forms.ToolStripSeparator
+        $null = $notify_icon.ContextMenuStrip.Items.Add($ToolStripSeparator)
+
+
+        # メニューにサンプルのリマインド表示を追加
+        $script = {
+            OutHostMessage "sample Remind toastクリック！"
+            & (GetToastScript -message "sample Message" -toastType Remind)
+        }
+        $menuItemSampleRemind = NewToolStripMenuItem -name "Sample Remind toast" -action $script
+        $null = $notify_icon.ContextMenuStrip.Items.Add($menuItemSampleRemind)
+
+        # メニューにセパレータ追加
+        $ToolStripSeparator = New-Object System.Windows.Forms.ToolStripSeparator
+        $null = $notify_icon.ContextMenuStrip.Items.Add($ToolStripSeparator)
+
 
         # メニューに日付リマインドファイルチェックを追加
         $script = {
