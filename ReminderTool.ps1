@@ -41,8 +41,16 @@ function OutHostMessage {
 }
 
 $Global:lastCheckMinutes = (GetMinutes).AddMinutes(-1)
-function CheckRemand {
 
+function CheckRemands {
+    param (
+        [Parameter(Mandatory)]
+        [datetime] $startTime,
+        [Parameter(Mandatory)]
+        [datetime] $endTime,
+        [Parameter(Mandatory)]
+        [scriptblock] $toastScript
+    )
     # リマインド一覧の再読み込み
     $remainders = GetRemindList
     $dateRemainders = GetDateRemindList
@@ -50,12 +58,9 @@ function CheckRemand {
     $remainders.OK += $dateRemainders.OK
 
     # リマインドに一致するか確認
-    $checkMinutes = GetMinutes
-    # PCがスリープ中、powershellが止まってしまうので、最後にチェックした分(minutes)+1から今の分までを確認する
-    $checkStartMinutes = $Global:lastCheckMinutes.AddMinutes(1)
     $targetToast = @()
     $targetToast += $remainders.OK | % {
-        FilterMatchRemind -remined $_ -checkStartMinits $checkStartMinutes -checkEndMinits  $checkMinutes
+        FilterMatchRemind -remined $_ -checkStartMinits $startTime -checkEndMinits $endTime
     }
 
     # 通知対象をログに出力
@@ -64,36 +69,7 @@ function CheckRemand {
         $targetToast | % { OutHostMessage $_.original }
     }
     # リマインドに一致したらトースト表示
-    $targetToast | % { & (GetToastScript -message $_.message -toastType Remind) }
-
-    # 最終チェック日時を保存
-    $Global:lastCheckMinutes = $checkMinutes
-}
-
-function CheckTodayRemand {
-
-    # リマインド一覧の再読み込み
-    $remainders = GetRemindList
-    $dateRemainders = GetDateRemindList
-
-    $remainders.OK += $dateRemainders.OK
-
-    # リマインドに一致するか確認
-    $todayStart = ((Get-Date).Date)
-    $todayEnd = ((Get-Date).Date).AddDays(1).AddMinutes(-1)
-    $targetToast = @()
-    $targetToast += $remainders.OK | % {
-        FilterMatchRemind -remined $_ -checkStartMinits $todayStart -checkEndMinits $todayEnd
-    }
-
-    # 通知対象をログに出力
-    if ($targetToast.count -ne 0) {
-        OutHostMessage "◆◇◆通知対象がヒット！"
-        $targetToast | % { OutHostMessage $_.original }
-    }
-    # リマインドに一致したらトースト表示
-    $targetToast | Sort-Object -Property "time" -Descending `
-    | % { & (GetToastScript -message ("【" + $_.time + "】" + $_.message) -toastType Alarm) }
+    & $toastScript $targetToast
 }
 
 $mutex = New-Object System.Threading.Mutex($false, $MUTEX_NAME)
@@ -130,7 +106,15 @@ try {
         # メニューに今日のリマインド表示を追加
         $script = {
             OutHostMessage "Notify Today Remindクリック！"
-            CheckTodayRemand
+
+            $todayStart = ((Get-Date).Date)
+            $todayEnd = ((Get-Date).Date).AddDays(1).AddMinutes(-1)
+            $toastScript = {
+                param ( $targetToast )
+                $targetToast | Sort-Object -Property "time" -Descending `
+                | % { & (GetToastScript -message ("【" + $_.time + "】" + $_.message) -toastType Alarm) }
+            }
+            CheckRemands -startTime $todayStart -endTime $todayEnd -toastScript $toastScript
         }
         $menuItemNotifyTodayRemind = NewToolStripMenuItem -name "Notify Today Remind" -action $script
         $null = $notify_icon.ContextMenuStrip.Items.Add($menuItemNotifyTodayRemind)
@@ -224,13 +208,24 @@ try {
         $null = $notify_icon.ContextMenuStrip.Items.Add($menuItemExit)
 
 
-        # タイマーイベント.
+        # タイマーイベント
+        $Global:lastCheckMinutes = (GetMinutes).AddMinutes(-1)
         $timerEvent = {
             OutHostMessage  "Timer実行！"
             $timer.Stop()
 
             # リマインドをチェック！！
-            CheckRemand
+            $startTime = $Global:lastCheckMinutes.AddMinutes(1)
+            $endTime =GetMinutes
+            $toastScript ={
+                param ( $targetToast )
+                $targetToast | % { & (GetToastScript -message $_.message -toastType Remind) }
+            }
+
+            CheckRemands -startTime $startTime -endTime $endTime -toastScript $toastScript
+
+            # 最終チェック日時を保存
+            $Global:lastCheckMinutes = $endTime
 
             $timer.Interval = GetNextMinutesUpToMillSeconds
             $timer.Interval += 100 # 精度の問題か分が変わらないことがあるのでもうちょっと待つ
