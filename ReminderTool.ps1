@@ -6,6 +6,7 @@ Set-StrictMode -Version Latest
 Get-ChildItem  -Path ".\subScript" -File | ? { $_.Extension -eq ".ps1" -and $_.BaseName -notlike "*Tests*" } | % { . $_.FullName }
 
 Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName presentationframework
 
 # 定数定義
 $MUTEX_NAME = "81C2DF76-F362-4913-B6E3-8232AAA66F62" # 多重起動チェック用
@@ -42,7 +43,7 @@ function OutHostMessage {
 
 $Global:lastCheckMinutes = (GetMinutes).AddMinutes(-1)
 
-function CheckRemands {
+function CheckRemainds {
     param (
         [Parameter(Mandatory)]
         [datetime] $startTime,
@@ -70,6 +71,54 @@ function CheckRemands {
     }
     # リマインドに一致したらトースト表示
     & $toastScript $targetToast
+}
+
+function AnyDayCheckRemaind {
+    # xamlの読み込み
+    $xamlFile = $CALENDAR_XAML_FILE
+    [xml]$xaml = Get-Content $xamlFile -Raw
+
+    # 画面サイズから表示位置を設定
+    $Mainscreen = [System.Windows.Forms.Screen]::PrimaryScreen
+    $xaml.Window.Top = ($Mainscreen.WorkingArea.Height - $xaml.Window.Height).ToString()
+    $xaml.Window.Left = ($Mainscreen.WorkingArea.Width - $xaml.Window.Width).ToString()
+
+    # xamlの読み込み
+    $reader = New-Object System.Xml.XmlNodeReader $xaml
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+
+    # 各コントロール取得
+    $calendar = $window.FindName("calendar")
+    $button_OK = $window.FindName("button_OK")
+    $button_Cancel = $window.FindName("button_Cancel")
+
+    # OKボタン
+    $button_OK.add_Click(
+        {
+            if ($null -eq $calendar.SelectedDate ) {
+                $window.Close()
+                return
+            }
+
+            $anyDayStart = $calendar.SelectedDate.Date
+            $anyDayEnd = $anyDayStart.AddDays(1).AddMinutes(-1)
+            $toastScript = {
+                param ( $targetToast )
+                $targetToast | Sort-Object -Property "time" -Descending `
+                | % { & (GetToastScript -message ("【" + $anyDayStart.ToString("yyyy/MM/dd ") + $_.time + "】" + $_.message) -toastType Alarm) }
+            }
+            CheckRemainds -startTime $anyDayStart -endTime $anyDayEnd -toastScript $toastScript
+
+            $window.Close()
+        }
+    )
+
+    # キャンセルボタン
+    $button_Cancel.add_Click( { $window.Close() })
+
+    $window.ShowDialog() | Out-Null
+
+
 }
 
 $mutex = New-Object System.Threading.Mutex($false, $MUTEX_NAME)
@@ -114,9 +163,18 @@ try {
                 $targetToast | Sort-Object -Property "time" -Descending `
                 | % { & (GetToastScript -message ("【" + $_.time + "】" + $_.message) -toastType Alarm) }
             }
-            CheckRemands -startTime $todayStart -endTime $todayEnd -toastScript $toastScript
+            CheckRemainds -startTime $todayStart -endTime $todayEnd -toastScript $toastScript
         }
         $menuItemNotifyTodayRemind = NewToolStripMenuItem -name "Notify Today Remind" -action $script
+        $null = $notify_icon.ContextMenuStrip.Items.Add($menuItemNotifyTodayRemind)
+
+        # メニューにいつかの日のリマインド表示を追加
+        $script = {
+            OutHostMessage "Notify any day Remindクリック！"
+
+            AnyDayCheckRemaind
+        }
+        $menuItemNotifyTodayRemind = NewToolStripMenuItem -name "Notify any day Remind" -action $script
         $null = $notify_icon.ContextMenuStrip.Items.Add($menuItemNotifyTodayRemind)
 
         # メニューにセパレータ追加
@@ -216,13 +274,13 @@ try {
 
             # リマインドをチェック！！
             $startTime = $Global:lastCheckMinutes.AddMinutes(1)
-            $endTime =GetMinutes
-            $toastScript ={
+            $endTime = GetMinutes
+            $toastScript = {
                 param ( $targetToast )
                 $targetToast | % { & (GetToastScript -message $_.message -toastType Remind) }
             }
 
-            CheckRemands -startTime $startTime -endTime $endTime -toastScript $toastScript
+            CheckRemainds -startTime $startTime -endTime $endTime -toastScript $toastScript
 
             # 最終チェック日時を保存
             $Global:lastCheckMinutes = $endTime
