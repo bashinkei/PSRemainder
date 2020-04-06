@@ -21,51 +21,51 @@ function GetPSObjectArray {
 
 Describe "FilterMatchRemind" {
     It "開始分をちょうど含む" {
-        $remainds = GetPSObjectArray
+        $reminds = GetPSObjectArray
         $checkStartMinits = "2020/02/01 00:00:00"
         $checkEndMinits   = "2020/02/01 00:00:00"
         $object = @()
-        $object += $remainds | % {
+        $object += $reminds | % {
             FilterMatchRemind -remined $_ -checkStartMinits $checkStartMinits -checkEndMinits $checkEndMinits
         }
         $object.count | Should Be 1
     }
     It "開始分をちょうど含まない" {
-        $remainds = GetPSObjectArray
+        $reminds = GetPSObjectArray
         $checkStartMinits = "2020/02/01 00:02:00"
         $checkEndMinits   = "2020/02/01 00:02:00"
         $object = @()
-        $object += $remainds | % {
+        $object += $reminds | % {
             FilterMatchRemind -remined $_ -checkStartMinits $checkStartMinits -checkEndMinits $checkEndMinits
         }
         $object.count | Should Be 0
     }
     It "終了分をちょうど含む" {
-        $remainds = GetPSObjectArray
+        $reminds = GetPSObjectArray
         $checkStartMinits = "2020/02/01 23:59:00"
         $checkEndMinits   = "2020/02/01 23:59:00"
         $object = @()
-        $object += $remainds | % {
+        $object += $reminds | % {
             FilterMatchRemind -remined $_ -checkStartMinits $checkStartMinits -checkEndMinits $checkEndMinits
         }
         $object.count | Should Be 1
     }
     It "終了分をちょうど含まない" {
-        $remainds = GetPSObjectArray
+        $reminds = GetPSObjectArray
         $checkStartMinits = "2020/02/01 23:58:00"
         $checkEndMinits   = "2020/02/01 23:58:00"
         $object = @()
-        $object += $remainds | % {
+        $object += $reminds | % {
             FilterMatchRemind -remined $_ -checkStartMinits $checkStartMinits -checkEndMinits $checkEndMinits
         }
         $object.count | Should Be 0
     }
     It "日付をまたいでもできる" {
-        $remainds = GetPSObjectArray
+        $reminds = GetPSObjectArray
         $checkStartMinits = "2020/02/01 00:01:00"
         $checkEndMinits = "2020/02/09 17:59:00"
         $object = @()
-        $object += $remainds | % {
+        $object += $reminds | % {
             FilterMatchRemind -remined $_ -checkStartMinits $checkStartMinits -checkEndMinits $checkEndMinits
         }
         $object.count | Should Be 5

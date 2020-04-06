@@ -11,17 +11,17 @@ function ReadDateRemindListcsv {
 function ValidateDateRemind {
     param (
         [Parameter(Mandatory)]
-        [PSCustomObject] $remaind
+        [PSCustomObject] $remind
     )
     # dateのチェック
     $temp = [datetime]::Now
-    [bool]$check = [datetime]::TryParseExact($remaind.date, $Global:DATE_FORMAT, [Globalization.DateTimeFormatInfo]::CurrentInfo, [Globalization.DateTimeStyles]::AllowWhiteSpaces, [ref]$temp)
+    [bool]$check = [datetime]::TryParseExact($remind.date, $Global:DATE_FORMAT, [Globalization.DateTimeFormatInfo]::CurrentInfo, [Globalization.DateTimeStyles]::AllowWhiteSpaces, [ref]$temp)
     if (-not $check) {
         return ValidateReslut $false "dateが不正です"
     }
     # timeのチェック
     $temp = [datetime]::Now
-    [bool]$check = [datetime]::TryParseExact($remaind.time, $Global:TIME_FORMAT, [Globalization.DateTimeFormatInfo]::CurrentInfo, [Globalization.DateTimeStyles]::AllowWhiteSpaces, [ref]$temp)
+    [bool]$check = [datetime]::TryParseExact($remind.time, $Global:TIME_FORMAT, [Globalization.DateTimeFormatInfo]::CurrentInfo, [Globalization.DateTimeStyles]::AllowWhiteSpaces, [ref]$temp)
     if (-not $check) {
         return ValidateReslut $false "timeが不正です"
     }
@@ -32,21 +32,21 @@ function ValidateDateRemind {
 function ValidateDateReminds {
     param (
         [Parameter(Mandatory)]
-        [array] $remaindList
+        [array] $remindList
     )
 
     $NG = @()
     $OK = @()
 
-    foreach ($remaind in $remaindList) {
-        $validateReslut = ValidateDateRemind $remaind
+    foreach ($remind in $remindList) {
+        $validateReslut = ValidateDateRemind $remind
         if ($validateReslut.reslut) {
-            $OK += $remaind
+            $OK += $remind
         }
         else {
-            $pops = (Get-Member -InputObject $remaind -MemberType NoteProperty).Name
+            $pops = (Get-Member -InputObject $remind -MemberType NoteProperty).Name
             $pops += @{name = 'NGMessage'; expression = { $validateReslut.errorMessage } }
-            $NG += $remaind | Select-Object -Property $pops
+            $NG += $remind | Select-Object -Property $pops
         }
     }
     return [PSCustomObject]@{
@@ -63,9 +63,9 @@ function GetDateRemindList {
     $remindList = AddNumberToPsobjectArray $remindList
 
     # validation
-    $checkedReminds = ValidateDateReminds -remaindList $remindList
+    $checkedReminds = ValidateDateReminds -remindList $remindList
 
-    $remainders = $checkedReminds.OK | ForEach-Object {
+    $reminders = $checkedReminds.OK | ForEach-Object {
         $remind = $_
         $everyCheckScript = {
             param(
@@ -83,6 +83,6 @@ function GetDateRemindList {
     }
     return [PSCustomObject]@{
         NG = @($checkedReminds.NG)
-        OK = @($remainders)
+        OK = @($reminders)
     }
 }

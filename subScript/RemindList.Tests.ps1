@@ -24,21 +24,21 @@ function MakeRemind {
 }
 
 function GetReminds {
-    $remainds = @()
-    $remainds += MakeRemind "day"        "Notify"         "00:00" "day,Notify_Test_OK"
-    $remainds += MakeRemind "day"        "NotNotify"      "00:00" "day,NotNotify_Test_OK"
-    $remainds += MakeRemind "day"        "PrevWorkDay"    "00:00" "day,PrevWorkDay_Test_OK"
-    $remainds += MakeRemind "day"        "NextWorkDay"    "00:00" "day,NextWorkDay_Test_OK"
-    $remainds += MakeRemind "Monday"     "Notify"         "12:14" "Monday,Notify_test_OK"
-    $remainds += MakeRemind "Tuesday"    "NotNotify"      "12:14" "Tuesday,NotNotify_test_OK"
-    $remainds += MakeRemind "Wednesday"  "PrevWorkDay"    "15:00" "Wednesday,PrevWorkDay_test_OK"
-    $remainds += MakeRemind "Thursday"   "NextWorkDay"    "15:00" "Thursday,NextWorkDay_test_OK"
-    $remainds += MakeRemind "Friday"     "Notify"         "15:00" "Friday,Notify_test_OK"
-    $remainds += MakeRemind "-1st"       "Notify"         "15:00" "Friday,Notify_test_OK"
-    $remainds += MakeRemind "NG1"        "Notify"         "15:00" "everyが不正"
-    $remainds += MakeRemind "-1st"       "NG2"            "15:00" "whenNonWorkDayが不正"
-    $remainds += MakeRemind "-1st"       "Notify"         "25:00" "時間が不正"
-    return $remainds
+    $reminds = @()
+    $reminds += MakeRemind "day"        "Notify"         "00:00" "day,Notify_Test_OK"
+    $reminds += MakeRemind "day"        "NotNotify"      "00:00" "day,NotNotify_Test_OK"
+    $reminds += MakeRemind "day"        "PrevWorkDay"    "00:00" "day,PrevWorkDay_Test_OK"
+    $reminds += MakeRemind "day"        "NextWorkDay"    "00:00" "day,NextWorkDay_Test_OK"
+    $reminds += MakeRemind "Monday"     "Notify"         "12:14" "Monday,Notify_test_OK"
+    $reminds += MakeRemind "Tuesday"    "NotNotify"      "12:14" "Tuesday,NotNotify_test_OK"
+    $reminds += MakeRemind "Wednesday"  "PrevWorkDay"    "15:00" "Wednesday,PrevWorkDay_test_OK"
+    $reminds += MakeRemind "Thursday"   "NextWorkDay"    "15:00" "Thursday,NextWorkDay_test_OK"
+    $reminds += MakeRemind "Friday"     "Notify"         "15:00" "Friday,Notify_test_OK"
+    $reminds += MakeRemind "-1st"       "Notify"         "15:00" "Friday,Notify_test_OK"
+    $reminds += MakeRemind "NG1"        "Notify"         "15:00" "everyが不正"
+    $reminds += MakeRemind "-1st"       "NG2"            "15:00" "whenNonWorkDayが不正"
+    $reminds += MakeRemind "-1st"       "Notify"         "25:00" "時間が不正"
+    return $reminds
 }
 
 
@@ -49,8 +49,8 @@ Describe "GetRemindList" {
         $reminds = MakeRemind "day"        "Notify"         "00:00" "day,Notify_Test_OK"
         Mock ReadRemindListcsv -MockWith { return $reminds }
         It "OKが1件" {
-            $remaindList = GetRemindList
-            $remaindList.OK.count | Should Be 1
+            $remindList = GetRemindList
+            $remindList.OK.count | Should Be 1
         }
 
     }

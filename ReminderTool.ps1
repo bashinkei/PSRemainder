@@ -15,13 +15,13 @@ $MUTEX_NAME = "81C2DF76-F362-4913-B6E3-8232AAA66F62" # 多重起動チェック用
 function CheckRemindFile {
     param(
         [Parameter(Mandatory)]
-        [psobject] $remainds
+        [psobject] $reminds
     )
     $message = "エラーなし！"
     # エラーチェック
-    if ($remainds.NG.Count -ne 0 ) {
+    if ($reminds.NG.Count -ne 0 ) {
         $message = "解釈不能なデータがありました。`r`n"
-        $errs = $remainds.NG | Group-Object -Property "NGMessage"
+        $errs = $reminds.NG | Group-Object -Property "NGMessage"
         foreach ($err in $errs) {
             $message += $err.Name + " No. : "
             foreach ($No in $err.Group.No) {
@@ -43,7 +43,7 @@ function OutHostMessage {
 
 $Global:lastCheckMinutes = (GetMinutes).AddMinutes(-1)
 
-function CheckRemainds {
+function CheckReminds {
     param (
         [Parameter(Mandatory)]
         [datetime] $startTime,
@@ -53,14 +53,14 @@ function CheckRemainds {
         [scriptblock] $toastScript
     )
     # リマインド一覧の再読み込み
-    $remainders = GetRemindList
-    $dateRemainders = GetDateRemindList
+    $reminders = GetRemindList
+    $dateReminders = GetDateRemindList
 
-    $remainders.OK += $dateRemainders.OK
+    $reminders.OK += $dateReminders.OK
 
     # リマインドに一致するか確認
     $targetToast = @()
-    $targetToast += $remainders.OK | % {
+    $targetToast += $reminders.OK | % {
         FilterMatchRemind -remined $_ -checkStartMinits $startTime -checkEndMinits $endTime
     }
 
@@ -73,7 +73,7 @@ function CheckRemainds {
     & $toastScript $targetToast
 }
 
-function AnyDayCheckRemaind {
+function AnyDayCheckRemind {
     # xamlの読み込み
     $xamlFile = $CALENDAR_XAML_FILE
     [xml]$xaml = Get-Content $xamlFile -Raw
@@ -107,7 +107,7 @@ function AnyDayCheckRemaind {
                 $targetToast | Sort-Object -Property "time" -Descending `
                 | % { & (GetToastScript -message ("【" + $anyDayStart.ToString("yyyy/MM/dd ") + $_.time + "】" + $_.message) -toastType Alarm) }
             }
-            CheckRemainds -startTime $anyDayStart -endTime $anyDayEnd -toastScript $toastScript
+            CheckReminds -startTime $anyDayStart -endTime $anyDayEnd -toastScript $toastScript
 
             $window.Close()
         }
@@ -163,7 +163,7 @@ try {
                 $targetToast | Sort-Object -Property "time" -Descending `
                 | % { & (GetToastScript -message ("【" + $_.time + "】" + $_.message) -toastType Alarm) }
             }
-            CheckRemainds -startTime $todayStart -endTime $todayEnd -toastScript $toastScript
+            CheckReminds -startTime $todayStart -endTime $todayEnd -toastScript $toastScript
         }
         $menuItemNotifyTodayRemind = NewToolStripMenuItem -name "Notify Today Remind" -action $script
         $null = $notify_icon.ContextMenuStrip.Items.Add($menuItemNotifyTodayRemind)
@@ -172,7 +172,7 @@ try {
         $script = {
             OutHostMessage "Notify any day Remindクリック！"
 
-            AnyDayCheckRemaind
+            AnyDayCheckRemind
         }
         $menuItemNotifyTodayRemind = NewToolStripMenuItem -name "Notify any day Remind" -action $script
         $null = $notify_icon.ContextMenuStrip.Items.Add($menuItemNotifyTodayRemind)
@@ -280,7 +280,7 @@ try {
                 $targetToast | % { & (GetToastScript -message $_.message -toastType Remind) }
             }
 
-            CheckRemainds -startTime $startTime -endTime $endTime -toastScript $toastScript
+            CheckReminds -startTime $startTime -endTime $endTime -toastScript $toastScript
 
             # 最終チェック日時を保存
             $Global:lastCheckMinutes = $endTime
