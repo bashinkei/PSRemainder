@@ -22,6 +22,8 @@ SetGlobalConst "HOLIDAYS_FILE" (join-path $RESOURCES_PATH "Holidays.csv")
 SetGlobalConst "TOAST_REMINDER_TEMPLATE_FILE" (join-path $RESOURCES_PATH "toastReminder.xml")
 SetGlobalConst "TOAST_ALARM_TEMPLATE_FILE" (join-path $RESOURCES_PATH "toastAlarm.xml")
 
+SetGlobalConst "CALENDAR_XAML_FILE" (join-path $RESOURCES_PATH "calendar.xaml")
+
 SetGlobalConst "ICON_PNG_FILE" (join-path $RESOURCES_PATH "icon.png")
 SetGlobalConst "ICON_FILE" (Join-Path $RESOURCES_PATH "icon.ico")
 

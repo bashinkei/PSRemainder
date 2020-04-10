@@ -11,19 +11,19 @@ function ReadRemindListcsv {
 function ValidateRemind {
     param (
         [Parameter(Mandatory)]
-        [PSCustomObject] $remaind
+        [PSCustomObject] $remind
     )
     # everyのチェック
-    if ($remaind.every -notin (DefinedEvery).every) {
+    if ($remind.every -notin (DefinedEvery).every) {
         return ValidateReslut $false "everyが不正です"
     }
     # whenNonWorkDayのチェック
-    if ($remaind.whenNonWorkDay -notin ([whenNonWorkDay].GetEnumNames())) {
+    if ($remind.whenNonWorkDay -notin ([whenNonWorkDay].GetEnumNames())) {
         return ValidateReslut $false "whenNonWorkDayが不正です"
     }
     # timeのチェック
     $temp = [datetime]::Now
-    [bool]$check = [datetime]::TryParseExact($remaind.time, $Global:TIME_FORMAT, [Globalization.DateTimeFormatInfo]::CurrentInfo, [Globalization.DateTimeStyles]::AllowWhiteSpaces, [ref]$temp)
+    [bool]$check = [datetime]::TryParseExact($remind.time, $Global:TIME_FORMAT, [Globalization.DateTimeFormatInfo]::CurrentInfo, [Globalization.DateTimeStyles]::AllowWhiteSpaces, [ref]$temp)
     if (-not $check) {
         return ValidateReslut $false "timeが不正です"
     }
@@ -34,21 +34,21 @@ function ValidateRemind {
 function ValidateReminds {
     param (
         [Parameter(Mandatory)]
-        [array] $remaindList
+        [array] $remindList
     )
 
     $NG = @()
     $OK = @()
 
-    foreach ($remaind in $remaindList) {
-        $validateReslut = ValidateRemind $remaind
+    foreach ($remind in $remindList) {
+        $validateReslut = ValidateRemind $remind
         if ($validateReslut.reslut) {
-            $OK += $remaind
+            $OK += $remind
         }
         else {
-            $pops = (Get-Member -InputObject $remaind -MemberType NoteProperty).Name
+            $pops = (Get-Member -InputObject $remind -MemberType NoteProperty).Name
             $pops += @{name = 'NGMessage'; expression = { $validateReslut.errorMessage } }
-            $NG += $remaind | Select-Object -Property $pops
+            $NG += $remind | Select-Object -Property $pops
         }
     }
     return [PSCustomObject]@{
@@ -65,9 +65,9 @@ function GetRemindList {
     $remindList = AddNumberToPsobjectArray $remindList
 
     # validation
-    $checkedReminds = ValidateReminds -remaindList $remindList
+    $checkedReminds = ValidateReminds -remindList $remindList
 
-    $remainders = $checkedReminds.OK | ForEach-Object {
+    $reminders = $checkedReminds.OK | ForEach-Object {
         # toast実行用スクリプト付きにする
         $everyCheckScript = GetEveryCheckScript -every $_.every -whenNonWorkDay $_.whenNonWorkDay
         return [PSCustomObject]@{
@@ -81,6 +81,6 @@ function GetRemindList {
     }
     return [PSCustomObject]@{
         NG = @($checkedReminds.NG)
-        OK = @($remainders)
+        OK = @($reminders)
     }
 }
