@@ -26,6 +26,9 @@ function GetEveryCheckScript {
     elseif ($definedEvry.type -eq [EveryType]::MonthlyOfWorkDay) {
         GetMonthlyOfWorkDayCheckScript
     }
+    elseif ($definedEvry.type -eq [EveryType]::MonthlyNthWeekOfDay) {
+        GetMonthlyNthWeekOfDayCheckScript
+    }
 
     # ‹x“ú‚Å‚à’Ê’m‚·‚é‚Ìê‡
     if ($whenNonWorkDay -eq [whenNonWorkDay]::Notify) {
@@ -153,9 +156,49 @@ function GetMonthlyOfWorkDayCheckScript {
         # ‰Ò“­“ú”‚ğ’´‚¦‚Ä‚¢‚½‚çNG
         if ($workdays.count -lt [System.Math]::Abs($nth)) { $false }
 
-        $arrayIndex = if ($nth -gt 0) { $nth - 1 } else {$workdays.count + $nth}
+        $arrayIndex = if ($nth -gt 0) { $nth - 1 } else { $workdays.count + $nth }
         $nthDay = ($workdays | Sort-Object)[$arrayIndex]
 
         return $nthDay.Day -eq $checkDate.Day
+    }
+}function GetMonthlyNthWeekOfDayCheckScript {
+    [OutputType([scriptblock])]
+    param()
+
+    return {
+        param (
+            [Parameter(Mandatory)]
+            [datetime] $checkDate,
+            [Parameter(Mandatory)]
+            [string]$checkEvery
+        )
+
+        $nthWeekOfDay = $checkEvery.Split("_")
+        [int]$nth = $nthWeekOfDay[0].TrimEnd('st nd rd th')
+        [DayOfWeek]$dayOfWeek = $nthWeekOfDay[1]
+
+        # —j“ú‚Ì”»’è
+        if ($checkDate.DayOfWeek -ne $dayOfWeek) { return $false }
+
+        # ‘æ‰½‚Ì”»’è
+        ## ‘ÎÛ‚ÌŒ‚Ì‘æXX—j‚ğæ“¾
+        $isInverse = $nth -lt 0
+        $inverseCal = if ($isInverse) { -1 }else { 1 }
+
+        $refDay = if ($isInverse) {
+            ([datetime]::new($checkDate.Year, $checkDate.Month , 1)).AddMonths(1).AddDays(-1)
+        }
+        else {
+            [datetime]::new($checkDate.Year, $checkDate.Month , 1)
+        }
+        $refWeekOfDay = $refDay
+        while ($refWeekOfDay.DayOfWeek -ne $dayOfWeek) {
+            $refWeekOfDay = $refWeekOfDay.AddDays($inverseCal)
+        }
+
+        $numOfWeek = [enum]::GetValues("DayOfWeek").Length
+        $targetNthWeekOfDay = $refWeekOfDay.AddDays(([math]::Abs($nth) - 1) * $numOfWeek * $inverseCal)
+
+        return $targetNthWeekOfDay -eq $checkDate
     }
 }

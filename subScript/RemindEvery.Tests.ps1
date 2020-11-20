@@ -95,6 +95,60 @@ Describe "GetMonthlyOfWorkDayCheckScript" {
     }
 }
 
+Describe "GetMonthlyNthWeekOfDayCheckScript" {
+    $script = GetMonthlyNthWeekOfDayCheckScript
+
+    # ³íŒn
+    It "1st_Monday‚Í‘æ1Œ—j‚Ìê‡‚Étrue‚ğ•Ô‚·" {
+        & ($script) "2020/10/5" "1st_Monday" | Should Be $true
+    }
+    It "2nd_Tuesday‚Í‘æ2‰Î—j‚Ìê‡‚Étrue‚ğ•Ô‚·" {
+        & ($script) "2020/10/13" "2nd_Tuesday" | Should Be $true
+    }
+    It "3rd_Wednesday‚Í‘æ3…—j‚Ìê‡‚Étrue‚ğ•Ô‚·" {
+        & ($script) "2020/10/21" "3rd_Wednesday" | Should Be $true
+    }
+    It "4th_Thursday‚Í‘æ4–Ø—j‚Ìê‡‚Étrue‚ğ•Ô‚·" {
+        & ($script) "2020/10/22" "4th_Thursday" | Should Be $true
+    }
+    It "5th_Friday‚Í‘æ5‹à—j‚Ìê‡‚Étrue‚ğ•Ô‚·" {
+        & ($script) "2020/10/30" "5th_Friday" | Should Be $true
+    }
+
+    It "-1st_Monday‚ÍŒ––‚©‚ç”‚¦‚Ä‘æ1Œ—j‚Ìê‡‚Étrue‚ğ•Ô‚·" {
+        & ($script) "2020/10/26" "-1st_Monday" | Should Be $true
+    }
+    It "-2nd_Tuesday‚ÍŒ––‚©‚ç”‚¦‚Ä‘æ2‰Î—j‚Ìê‡‚Étrue‚ğ•Ô‚·" {
+        & ($script) "2020/10/20" "-2nd_Tuesday" | Should Be $true
+    }
+    It "-3rd_Wednesday‚ÍŒ––‚©‚ç”‚¦‚Ä‘æ3…—j‚Ìê‡‚Étrue‚ğ•Ô‚·" {
+        & ($script) "2020/10/14" "-3rd_Wednesday" | Should Be $true
+    }
+    It "-4th_Thursday‚ÍŒ––‚©‚ç”‚¦‚Ä‘æ4–Ø—j‚Ìê‡‚Étrue‚ğ•Ô‚·" {
+        & ($script) "2020/10/8" "-4th_Thursday" | Should Be $true
+    }
+    It "-5th_Friday‚ÍŒ––‚©‚ç”‚¦‚Ä‘æ5‹à—j‚Ìê‡‚Étrue‚ğ•Ô‚·" {
+        & ($script) "2020/10/2" "-5th_Friday" | Should Be $true
+    }
+
+
+    # ˆÙíŒn
+    It "—j“ú‚ªˆÙ‚È‚éê‡‚ÍFalse" {
+        & ($script) "2020/10/2" "1st_Monday" | Should Be $false
+        & ($script) "2020/10/2" "2nd_Monday" | Should Be $false
+        & ($script) "2020/10/2" "3rd_Monday" | Should Be $false
+    }
+    It "—j“ú‚ª“¯‚¶‚Å‚àT‚ªˆÙ‚È‚ê‚ÎFalse" {
+        & ($script) "2020/10/5" "2nd_Monday" | Should Be  $false
+        & ($script) "2020/10/19" "2nd_Monday" | Should Be $false
+        & ($script) "2020/10/26" "2nd_Monday" | Should Be $false
+    }
+    It "—j“ú‚ª“¯‚¶‚Å‚àT‚ªˆÙ‚È‚ê‚ÎFalse Œ––‚©‚ç‚Ìê‡" {
+        & ($script) "2020/10/5"  "-2nd_Monday" | Should Be  $false
+        & ($script) "2020/10/12" "-2nd_Monday" | Should Be $false
+        & ($script) "2020/10/26" "-2nd_Monday" | Should Be $false
+    }
+}
 
 Describe "GetEveryCheckScript" {
 
