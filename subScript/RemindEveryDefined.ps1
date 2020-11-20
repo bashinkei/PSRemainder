@@ -11,6 +11,7 @@ Enum EveryType {
     Monthly
     MonthlyInverse
     MonthlyOfWorkDay
+    MonthlyNthWeekOfDay
 }
 
 function DefinedEvery {
@@ -153,5 +154,80 @@ function DefinedEvery {
     [PSCustomObject]@{ every = "-29thWorkDay"; type = [EveryType]::MonthlyOfWorkDay }
     [PSCustomObject]@{ every = "-30thWorkDay"; type = [EveryType]::MonthlyOfWorkDay }
     [PSCustomObject]@{ every = "-31stWorkDay"; type = [EveryType]::MonthlyOfWorkDay }
+    #endregion
+    #region åééü ëÊXXójì˙
+    [PSCustomObject]@{ every = "1st_Monday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "1st_Tuesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "1st_Wednesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "1st_Thursday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "1st_Friday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "1st_Saturday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "1st_Sunday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "2nd_Monday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "2nd_Tuesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "2nd_Wednesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "2nd_Thursday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "2nd_Friday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "2nd_Saturday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "2nd_Sunday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "3rd_Monday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "3rd_Tuesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "3rd_Wednesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "3rd_Thursday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "3rd_Friday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "3rd_Saturday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "3rd_Sunday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "4th_Monday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "4th_Tuesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "4th_Wednesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "4th_Thursday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "4th_Friday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "4th_Saturday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "4th_Sunday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "5th_Monday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "5th_Tuesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "5th_Wednesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "5th_Thursday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "5th_Friday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "5th_Saturday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "5th_Sunday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    #endregion
+
+    #region åééüÅ@ëÊXXójÅ@åéññÇ©ÇÁêîÇ¶Çƒ
+    [PSCustomObject]@{ every = "-1st_Monday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-1st_Tuesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-1st_Wednesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-1st_Thursday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-1st_Friday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-1st_Saturday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-1st_Sunday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-2nd_Monday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-2nd_Tuesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-2nd_Wednesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-2nd_Thursday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-2nd_Friday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-2nd_Saturday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-2nd_Sunday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-3rd_Monday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-3rd_Tuesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-3rd_Wednesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-3rd_Thursday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-3rd_Friday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-3rd_Saturday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-3rd_Sunday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-4th_Monday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-4th_Tuesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-4th_Wednesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-4th_Thursday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-4th_Friday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-4th_Saturday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-4th_Sunday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-5th_Monday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-5th_Tuesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-5th_Wednesday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-5th_Thursday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-5th_Friday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-5th_Saturday"; type = [EveryType]::MonthlyNthWeekOfDay }
+    [PSCustomObject]@{ every = "-5th_Sunday"; type = [EveryType]::MonthlyNthWeekOfDay }
     #endregion
 }
